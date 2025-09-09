@@ -65,7 +65,7 @@ Our CUDA version is 12.2.
    python naturality-aux-evo-batch.py \ 
    --model_dir ./Ntabacum4097/Ntabacum4097-aux1-2-classify \
    --population_size 100 \
-   --mutation_rate 5 \
+   --mutation_rate 0.05 \
    --crossover_rate 0.7 \
    --max_generations 100 \
    --batch_size 50 \
