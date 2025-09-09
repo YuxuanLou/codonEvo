@@ -1,18 +1,3 @@
-
-<h3 align="center">project_title</h3>
-
-  <p align="center">
-    project_description
-    <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
-    &middot;
-    <a href="https://github.com/github_username/repo_name/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    &middot;
-    <a href="https://github.com/github_username/repo_name/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
-  </p>
 # codonEvo: A Codon Optimization Tool Based on Pretrained Language Models
 
 
@@ -26,7 +11,7 @@
       <a href="#about-the-project">About The Project</a>
     </li>
     <li>
-      <a href="#Installation">Getting Started</a>
+      <a href="#Installation">Installation</a>
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#license">License</a></li>
@@ -40,8 +25,6 @@
 ## About The Project
 
 CodonEvo, through its two major modules CodonNAT and CodonEXP, learns the codon usage preferences of endogenous proteins within the host species and the latent features of highly expressed CDS sequences. It guides the codon optimization of heterologous proteins in the host species for “high naturalness” and “high expression levels” using a genetic algorithm.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -58,8 +41,6 @@ CodonEvo, through its two major modules CodonNAT and CodonEXP, learns the codon 
    pip install -r requirements.txt
    ```
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- USAGE EXAMPLES -->
@@ -68,8 +49,6 @@ CodonEvo, through its two major modules CodonNAT and CodonEXP, learns the codon 
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
 _For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 1. Initialize CDS
 
@@ -109,8 +88,6 @@ The model weights and detailed explanations of the parameters will be made publi
 ## License
 
 Distributed under the project_license. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
