@@ -30,6 +30,8 @@ CodonEvo, through its two major modules CodonNAT and CodonEXP, learns the codon 
 
 ## Installation
 
+Our CUDA version is 12.2.
+
 1. Create a conda environment
 
    ```sh
