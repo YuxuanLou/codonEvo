@@ -25,45 +25,27 @@ def get_masked_cds_for_protein(protein_sequence):
 def get_codon_to_amino_acid_map():
     standard_table = CodonTable.standard_rna_table
     codon_to_aa = {}
-
     for codon, aa in standard_table.forward_table.items():
         codon_to_aa[codon] = aa
-
     for stop_codon in standard_table.stop_codons:
         codon_to_aa[stop_codon] = '*'
-
     return codon_to_aa
 
 
-def mask_all_codons(input_ids, attention_mask,
-                    tokenizer):
+def mask_all_codons(input_ids, attention_mask,tokenizer):
     masked_inputs = input_ids.clone()
-
-    special_tokens = [
-        tokenizer.pad_token_id,
-        tokenizer.eos_token_id,
-        tokenizer.bos_token_id
-    ]
+    special_tokens = [tokenizer.pad_token_id,tokenizer.eos_token_id,tokenizer.bos_token_id]
     valid_positions = attention_mask.bool()
     for token_id in special_tokens:
         if token_id is not None:
-            valid_positions &= (
-                        input_ids != token_id)
-
-    masked_inputs[
-        valid_positions] = tokenizer.mask_token_id
-    mask_indices = valid_positions.nonzero(
-        as_tuple=True)
-
+            valid_positions &= (input_ids != token_id)
+    masked_inputs[valid_positions] = tokenizer.mask_token_id
+    mask_indices = valid_positions.nonzero(as_tuple=True)
     return masked_inputs, mask_indices
 
 
-def predict_cds_from_protein(model, cds_tokenizer,
-                             protein_tokenizer,
-                             protein_sequence,
-                             device):
+def predict_cds_from_protein(model, cds_tokenizer,protein_tokenizer,protein_sequence,device):
     codon_to_aa = get_codon_to_amino_acid_map()
-
     protein_encoding = protein_tokenizer(
         protein_sequence,
         padding='max_length',
@@ -72,8 +54,7 @@ def predict_cds_from_protein(model, cds_tokenizer,
         return_tensors='pt'
     )
 
-    masked_cds = get_masked_cds_for_protein(
-        protein_sequence)
+    masked_cds = get_masked_cds_for_protein(protein_sequence)
 
     cds_encoding = cds_tokenizer(
         masked_cds,
@@ -85,8 +66,7 @@ def predict_cds_from_protein(model, cds_tokenizer,
 
     masked_inputs, mask_positions = mask_all_codons(
         input_ids=cds_encoding['input_ids'],
-        attention_mask=cds_encoding[
-            'attention_mask'],
+        attention_mask=cds_encoding['attention_mask'],
         tokenizer=cds_tokenizer
     )
 
@@ -109,24 +89,19 @@ def predict_cds_from_protein(model, cds_tokenizer,
         )
 
         logits = outputs["logits"]
-        mask_logits = logits.squeeze()[
-            mask_positions[1]]
+        mask_logits = logits.squeeze()[mask_positions[1]]
 
         best_codons = []
 
-        for pos, aa in enumerate(
-                protein_sequence):
+        for pos, aa in enumerate(protein_sequence):
             pos_logits = mask_logits[pos]
-            probabilities = torch.softmax(
-                pos_logits, dim=0)
-            sorted_indices = torch.argsort(
-                probabilities, descending=True)
+            probabilities = torch.softmax(pos_logits, dim=0)
+            sorted_indices = torch.argsort(probabilities, descending=True)
 
             found_valid_codon = False
             for idx in sorted_indices:
                 token_id = idx.item()
-                codon = cds_tokenizer.decode(
-                    [token_id]).strip()
+                codon = cds_tokenizer.decode([token_id]).strip()
 
                 if len(codon) == 3 and codon in codon_to_aa:
                     if codon_to_aa[codon] == aa:
@@ -135,9 +110,7 @@ def predict_cds_from_protein(model, cds_tokenizer,
                         break
 
         predicted_cds = "".join(best_codons)
-        translated_protein = translate_cds_to_protein(
-            predicted_cds)
-
+        translated_protein = translate_cds_to_protein(predicted_cds)
     return predicted_cds, translated_protein
 
 
@@ -148,21 +121,14 @@ def process_protein_sequences(model,
                               output_file,
                               device):
     with open(output_file, 'w') as out_f:
-        for record in SeqIO.parse(input_file,
-                                  "fasta"):
+        for record in SeqIO.parse(input_file,"fasta"):
             protein_id = record.id
-            protein_sequence = str(
-                record.seq).upper().replace(' ',
-                                            '')
-
+            protein_sequence = str(record.seq).upper().replace(' ','').replace('\n', '').replace('\r', '')
             if len(protein_sequence) > 1022:
-                print(
-                    f"警告: 蛋白质序列 {protein_id} 长度({len(protein_sequence)})超过最大限制(1022)，跳过")
+                print(f"警告: 蛋白质序列 {protein_id} 长度({len(protein_sequence)})超过最大限制(1022)，跳过")
                 continue
-
             print(f"\n处理蛋白质: {protein_id}")
-            print(
-                f"蛋白质序列: {protein_sequence}")
+            print(f"蛋白质序列: {protein_sequence}")
 
             try:
                 predicted_cds, translated_protein = predict_cds_from_protein(
@@ -172,20 +138,14 @@ def process_protein_sequences(model,
                     protein_sequence=protein_sequence,
                     device=device
                 )
-
                 out_f.write(f">{protein_id}\n")
                 out_f.write(f"{predicted_cds}\n")
-
-                print(
-                    f"预测的CDS序列: {predicted_cds}")
-                print(
-                    f"翻译后的蛋白质: {translated_protein}")
-                print(
-                    f"与原始蛋白质匹配: {translated_protein.rstrip('*') == protein_sequence}")
+                print(f"预测的CDS序列: {predicted_cds}")
+                print(f"翻译后的蛋白质: {translated_protein}")
+                print(f"与原始蛋白质匹配: {translated_protein.rstrip('*') == protein_sequence}")
 
             except Exception as e:
-                print(
-                    f"处理蛋白质 {protein_id} 时出错: {str(e)}")
+                print(f"处理蛋白质 {protein_id} 时出错: {str(e)}")
                 continue
 
 
@@ -202,36 +162,19 @@ def main():
                         required=True,
                         help='输出的FASTA文件路径')
     args = parser.parse_args()
-
-
-    device = torch.device(
-        "cuda:0" if torch.cuda.is_available() else "cpu")
-
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("加载分词器...")
-    cds_tokenizer = RnaTokenizer.from_pretrained(
-        "multimolecule/mrnafm")
-    protein_tokenizer = AutoTokenizer.from_pretrained(
-        "facebook/esm2_t33_650M_UR50D")
-
-
+    cds_tokenizer = RnaTokenizer.from_pretrained("multimolecule/mrnafm")
+    protein_tokenizer = AutoTokenizer.from_pretrained("facebook/esm2_t33_650M_UR50D")
     print(f"从 {args.model_path} 加载模型...")
-    config = AutoConfig.from_pretrained(
-        "facebook/esm2_t33_650M_UR50D")
-    model = CustomPlantRNAModelmlm(config).to(
-        device)
-    model.load_state_dict(load_file(
-        f"{args.model_path}/model.safetensors"))
+    config = AutoConfig.from_pretrained("facebook/esm2_t33_650M_UR50D")
+    model = CustomPlantRNAModelmlm(config).to(device)
+    model.load_state_dict(load_file(f"{args.model_path}/model.safetensors"))
     model.eval()
-
     fusion_params = model.get_learned_parameters()
-    print(
-        f"RNA权重: {fusion_params['alpha']:.6f}")
-    print(
-        f"蛋白质权重: {fusion_params['beta']:.6f}")
-
-
-    print(
-        f"\n开始处理FASTA文件: {args.input_file}")
+    print(f"RNA权重: {fusion_params['alpha']:.6f}")
+    print(f"蛋白质权重: {fusion_params['beta']:.6f}")
+    print(f"\n开始处理FASTA文件: {args.input_file}")
     process_protein_sequences(
         model=model,
         cds_tokenizer=cds_tokenizer,
@@ -241,8 +184,7 @@ def main():
         device=device
     )
 
-    print(
-        f"\n所有预测完成! 结果已保存到 {args.output_file}")
+    print(f"\n所有预测完成! 结果已保存到 {args.output_file}")
 
 
 if __name__ == "__main__":
