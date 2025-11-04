@@ -45,7 +45,12 @@ Our CUDA version is 12.2.
 
 
 
+
+
+
+
 <!-- USAGE EXAMPLES -->
+
 ## Usage
 
 1. Initialize CDS
@@ -59,13 +64,13 @@ Our CUDA version is 12.2.
 
    
 
-2. Optimize CDS
+2. Optimize CDS with codonEvo
 
    ```sh
    python naturality-aux-evo-batch.py \ 
    --model_dir ./Ntabacum4097/Ntabacum4097-aux1-2-classify \
    --population_size 100 \
-   --mutation_rate 0.05 \
+   --mutation_rate 5 \
    --crossover_rate 0.7 \
    --max_generations 100 \
    --batch_size 50 \
@@ -80,6 +85,27 @@ Our CUDA version is 12.2.
    ```
 
 The model weights and detailed explanations of the parameters will be made public after the manuscript is submitted or published.
+
+3.  Optimize CDS with codonHallucination
+
+   ```sh
+   python codon-hallucination-plus.py --model_dir ./Ntabacum4097/Ntabacum4097-aux1-2-classify \
+   --mutation_rate 0.15 \
+   --iterations 16 \
+   --max_iterations 96 \
+   --min_expression_threshold 0.9 \
+   --min_naturality_threshold 0.6 \
+   --batch_size 16 \
+   --top_n 1 \
+   --results_dir ./Ntabacum4097/20-pro-100/results \
+   --perplexity_weight 1 \
+   --hallucination_perplexity_weight 1 \
+   --patience 20 \
+   --perplexity_model_dir ./Ntabacum4097/Ntabacum4097-finetune-mrnafm-with-pro-top10csi2/Ntabacum4097-finetune-mrnafm-with-pro-csitop10 \
+   --input ./Ntabacum4097/cds_list.fasta \
+   --output ./Ntabacum4097/cds_codonHallucination_test.txt \
+   --use_reversibility_check
+   ```
 
 <!-- LICENSE -->
 
