@@ -89,7 +89,7 @@ The model weights and detailed explanations of the parameters will be made publi
 3.  Optimize CDS with codonHallucination
 
    ```sh
-   python codon-hallucination-plus.py --model_dir ./Ntabacum4097/Ntabacum4097-aux1-2-classify \
+   python codonHallucination.py --model_dir ./Ntabacum4097/Ntabacum4097-aux1-2-classify \
    --mutation_rate 0.15 \
    --iterations 16 \
    --max_iterations 96 \
