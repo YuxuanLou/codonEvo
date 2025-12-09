@@ -57,7 +57,7 @@ Our CUDA version is 12.2.
 
    ```sh
    python initial_cds-batch.py \
-   --model_path ./Ntabacum4097/Ntabacum4097-finetune-mrnafm-with-pro-top10csi2/Ntabacum4097-finetune-mrnafm-with-pro-csitop10 \
+   --model_path ./plantmodel/Ntabacum4097/Ntabacum4097-finetune-mrnafm-with-pro/Ntabacum4097-finetune-top10csi-top10csi_mlm \
    --input_file input.fasta \
    --output_file initial_cds.fasta
    ```
@@ -68,7 +68,7 @@ Our CUDA version is 12.2.
 
    ```sh
    python naturality-aux-evo-batch.py \ 
-   --model_dir ./Ntabacum4097/Ntabacum4097-aux1-2-classify \
+   --model_dir ./plantmodel/Ntabacum4097/Ntabacum4097-aux1-2-classify \
    --population_size 100 \
    --mutation_rate 5 \
    --crossover_rate 0.7 \
@@ -79,7 +79,7 @@ Our CUDA version is 12.2.
    --results ./Ntabacum4097/20-pro-100/results \
    --history ./Ntabacum4097/20-pro-100/history \
    --perplexity_weight 1 \
-   --perplexity_model_dir ./Ntabacum4097/Ntabacum4097-finetune-mrnafm-with-pro-top10csi2/Ntabacum4097-finetune-mrnafm-with-pro-csitop10 \
+   --perplexity_model_dir ./plantmodel/Ntabacum4097/Ntabacum4097-finetune-mrnafm-with-pro/Ntabacum4097-finetune-top10csi-top10csi_mlm \
    --input ./Ntabacum4097/cds_list.fasta \
    --output ./Ntabacum4097/cds_codonEvo_list-100.fasta
    ```
@@ -89,7 +89,7 @@ The model weights and detailed explanations of the parameters will be made publi
 3.  Optimize CDS with codonHallucination
 
    ```sh
-   python CodonHallucination.py --model_dir ./Ntabacum4097/Ntabacum4097-aux1-2-classify \
+   python CodonHallucination.py --model_dir ./plantmodel/plaNtabacum4097/Ntabacum4097-aux1-2-classify \
    --mutation_rate 0.15 \
    --iterations 16 \
    --max_iterations 96 \
@@ -101,7 +101,7 @@ The model weights and detailed explanations of the parameters will be made publi
    --perplexity_weight 1 \
    --hallucination_perplexity_weight 1 \
    --patience 20 \
-   --perplexity_model_dir ./Ntabacum4097/Ntabacum4097-finetune-mrnafm-with-pro-top10csi2/Ntabacum4097-finetune-mrnafm-with-pro-csitop10 \
+   --perplexity_model_dir ./plantmodel/Ntabacum4097/Ntabacum4097-finetune-mrnafm-with-pro/Ntabacum4097-finetune-top10csi-top10csi_mlm \
    --input ./Ntabacum4097/cds_list.fasta \
    --output ./Ntabacum4097/cds_codonHallucination_test.txt \
    --use_reversibility_check
