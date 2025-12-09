@@ -105,6 +105,7 @@ The model weights and detailed explanations of the parameters will be made publi
    --input ./Ntabacum4097/cds_list.fasta \
    --output ./Ntabacum4097/cds_codonHallucination_test.txt \
    --use_reversibility_check
+   --codon_frequency_file ./Ntabacum4097/Ntabacum4097-codon_count.csv
    ```
 
 <!-- LICENSE -->
