@@ -485,7 +485,7 @@ class GradientOptimizer:
                 mutated_codons[idx] = random.choice(syn_options)
         return "".join(mutated_codons)
 
-    def optimize_with_gradients(self,cds_sequence):
+    def optimize_with_gradients(self,cds_sequence, results_dir=None):
         original_protein = self.translate_cds(cds_sequence)
         protein_encoding = self.protein_tokenizer(
             original_protein,
@@ -519,7 +519,16 @@ class GradientOptimizer:
                 'expression': initial_expr,
                 'naturality': initial_nat,
                 'fitness': initial_fitness}}
-
+        # 1. 初始化日志记录列表
+        log_records = []
+        # 2. 记录初始序列 (第0代)
+        log_records.append({
+            'iteration': 0,
+            'fitness': initial_fitness,
+            'naturalness': initial_nat,
+            'expression': initial_expr,
+            'sequence': cds_sequence,
+        })
         all_sequences_and_origins = {cds_sequence: 0}
         current_sequence_for_generation = cds_sequence
         global_best_fitness = initial_fitness
@@ -600,8 +609,28 @@ class GradientOptimizer:
                 for seq, expr, nat in zip(new_sequences_to_evaluate,expression_scores,naturality_scores):
                     fitness = expr * (nat ** self.perplexity_weight if nat > 0 else 0)
                     evaluated_data[seq] = {'expression': expr,'naturality': nat,'fitness': fitness}
+
+                    # <--- 修改点 3: 使用 all_sequences_and_origins 获取精确的迭代次数
+                    origin_iteration = all_sequences_and_origins.get(seq, total_iterations_run)  # Fallback just in case
+                    log_records.append({
+                        'iteration': origin_iteration,
+                        'fitness': fitness,
+                        'naturalness': nat,
+                        'expression': expr,
+                        'sequence': seq,
+                    })
+
             else:
                 print("此轮生成中未产生新的独立序列。")
+
+                # <--- 修改点 4: 检查 results_dir 并保存CSV
+            if results_dir and new_sequences_to_evaluate:
+                log_df = pd.DataFrame(log_records)
+                # <--- 修改点 5: 按 iteration 排序
+                log_df = log_df.sort_values(by=['iteration', 'fitness'], ascending=[True, False])
+                csv_path = os.path.join(results_dir, "optimization_log.csv")
+                log_df.to_csv(csv_path, index=False, encoding='utf-8')
+                print(f"优化过程日志已更新至: {csv_path}")
 
             if not evaluated_data:
                 print("警告: 没有可供评估的有效序列。停止优化。")
@@ -767,7 +796,11 @@ def main():
             'fitness': 'N/A'
         }
             continue
-        result = optimizer.optimize_with_gradients(cds_sequence)
+
+        seq_name = re.sub(r'[^\w\.-]', '_', seq_id.split()[0])
+        seq_results_dir = os.path.join(args.results_dir, seq_name)
+        os.makedirs(seq_results_dir, exist_ok=True)
+        result = optimizer.optimize_with_gradients(cds_sequence, results_dir=seq_results_dir)
 
         if not result or not result.get('top_sequences'):
             print(f"序列 {seq_id} 优化失败，保留原始序列。")
