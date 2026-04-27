@@ -45,9 +45,8 @@ HalluCodon is a species-specific codon optimization framework designed for plant
    git clone https://github.com/YuxuanLou/HalluCodon.git
    cd HalluCodon
    pip install -r requirements.txt
-   huggingface-cli download multimolecule/mrnafm \
-   --local-dir ./multimolecule/mrnafm \
-   --local-dir-use-symlinks False
+   wget -O multimolecule.tar.gz "https://zenodo.org/records/19807318/files/multimolecule.tar.gz?download=1"
+   tar -zxvf multimolecule.tar.gz
    huggingface-cli download facebook/esm2_t33_650M_UR50D \
    --local-dir ./facebook/esm2_t33_650M_UR50D \
    --local-dir-use-symlinks False
