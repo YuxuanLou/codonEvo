@@ -103,7 +103,7 @@ def main():
     test_data = test_data.reset_index(drop=True)
 
     cds_tokenizer = RnaTokenizer.from_pretrained("multimolecule/mrnafm")
-    protein_tokenizer = AutoTokenizer.from_pretrained("")
+    protein_tokenizer = AutoTokenizer.from_pretrained("facebook/esm2_t33_650M_UR50D")
 
     config = AutoConfig.from_pretrained("facebook/esm2_t33_650M_UR50D")
 
